@@ -1,0 +1,50 @@
+
+<?php
+
+function api_menu () {
+  $items = array();
+  $items['api'] = array(
+    'title' => 'api',
+    'description' => '',
+    'page callback' => 'salAPI',
+    'access arguments' => array(
+      'access content'
+    ) ,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+function salAPI () {
+  db_set_active('default');
+  $sth = db_query("SELECT nid FROM {node} WHERE type in ('event') ORDER BY created DESC")->fetchAll(PDO::FETCH_ASSOC);
+  $rows = array();
+  $c = 0;
+  foreach ($sth as $r) {
+    $rows[] = node_load($r['nid']);
+    $load_user = user_load($rows[$c]->uid);
+    $rows[$c]->url = base_path() . drupal_get_path_alias('node/' . $r['nid']);
+    $rows[$c]->created = date("F j, Y",$rows[$c]->created);
+    //$rows[$c]->user_data = user_load($rows[$c]->uid);
+    $rows[$c]->user_data['field_event_image'] = $load_user->field_event_image;
+    $rows[$c]->user_data['field_event_location'] = $load_user->field_event_location;
+    $rows[$c]->user_data['field_location_description'] = $load_user->field_location_description;
+    $rows[$c]->user_data['field_name_of_location'] = $load_user->field_name_of_location;
+    if (isset($rows[$c]->body['und'][0]['value']) && !empty($rows[$c]->body['und'][0]['value'])) {
+      $rows[$c]->body['und'][0]['trim'] = strip_tags($rows[$c]->body['und'][0]['safe_value']);
+      preg_match_all('/<img[^>]+>/i', $rows[$c]->body['und'][0]['value'], $result);
+      if (isset($result[0][0]) && $result[0][0]) {
+       preg_match_all('/(src)=("[^"]*")/i', $result[0][0], $img);
+       $imgsrc = $img[2][0];
+       $rows[$c]->img = str_replace('"', "", $imgsrc);
+     }
+    }
+    ++$c;  
+  }
+  print json_encode($rows);
+  
+  //echo "<pre>";
+  //print_r($rows);
+  //echo "</pre>";
+  
+  }

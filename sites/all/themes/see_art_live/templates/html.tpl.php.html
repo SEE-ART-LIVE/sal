@@ -1,0 +1,43 @@
+<?php
+/**
+ * @file
+ * Returns the HTML for the basic html structure of a single Drupal page.
+ *
+ * Complete documentation for this file is available online.
+ * @see https://drupal.org/node/1728208
+ */
+?><!DOCTYPE html>
+<html <?php print $html_attributes . $rdf_namespaces; ?>>
+<head>
+<meta charset=utf-8>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <?php print $head; ?>
+  <title><?php print $head_title; ?></title>
+  <?php if ($default_mobile_metatags): ?>
+    <meta name="MobileOptimized" content="width">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width">
+  <?php endif; ?>
+  <?php print $styles; ?>
+  <?php print $scripts; ?>
+  <?php if ($add_html5_shim): ?>
+    <!--[if lt IE 9]>
+    <script src="/d7/sites/all/themes/see_art_live/dist/js/html5shiv.min.js"></script>
+    <![endif]-->
+  <?php endif; ?>
+</head>
+<body class="<?php print $classes; ?>" <?php print $attributes;?>>
+  <?php 
+  if (strpos($_SERVER['REQUEST_URI'], 'user') !== false) {
+    print $page_top;
+    print $page;
+    print $page_bottom;
+  } else {
+    print "<noscript><strong>We're sorry but seeartlive doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript>";
+    print "<div id=app></div>";
+  }
+  ?>
+</body>
+</html>
